@@ -1,0 +1,158 @@
+{
+  "scenario": "人工智能治理指标口径版本与回算注册中心",
+  "synthetic": true,
+  "records": [
+    {
+      "record_id": "indicator_definition-001",
+      "payload": {
+        "indicator_id": "indicator_id-0",
+        "formula_complexity": 13.9,
+        "unit_rank": 15.8,
+        "dependency_count": 0.58,
+        "coverage_share": 0.69,
+        "effective_days": 21.5,
+        "source_age_days": 23.4,
+        "missing_policy": 0.25,
+        "recalculation_delay": 27.2,
+        "affected_members": 29.1,
+        "dimensions": 31.0,
+        "validation_rate": 0.69
+      },
+      "state": "drafted",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "indicator_definition-002",
+      "payload": {
+        "indicator_id": "indicator_id-1",
+        "formula_complexity": 17.6,
+        "unit_rank": 19.5,
+        "dependency_count": 0.69,
+        "coverage_share": 0.8,
+        "effective_days": 25.2,
+        "source_age_days": 27.1,
+        "missing_policy": 0.36,
+        "recalculation_delay": 30.9,
+        "affected_members": 32.8,
+        "dimensions": 34.7,
+        "validation_rate": 0.8
+      },
+      "state": "drafted",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "indicator_definition-003",
+      "payload": {
+        "indicator_id": "indicator_id-2",
+        "formula_complexity": 21.3,
+        "unit_rank": 23.2,
+        "dependency_count": 0.8,
+        "coverage_share": 0.91,
+        "effective_days": 28.9,
+        "source_age_days": 30.8,
+        "missing_policy": 0.47,
+        "recalculation_delay": 34.6,
+        "affected_members": 36.5,
+        "dimensions": 38.4,
+        "validation_rate": 0.91
+      },
+      "state": "drafted",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "indicator_definition-004",
+      "payload": {
+        "indicator_id": "indicator_id-3",
+        "formula_complexity": 25.0,
+        "unit_rank": 26.9,
+        "dependency_count": 0.91,
+        "coverage_share": 0.25,
+        "effective_days": 32.6,
+        "source_age_days": 34.5,
+        "missing_policy": 0.58,
+        "recalculation_delay": 38.3,
+        "affected_members": 40.2,
+        "dimensions": 42.1,
+        "validation_rate": 0.25
+      },
+      "state": "drafted",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "indicator_definition-005",
+      "payload": {
+        "indicator_id": "indicator_id-4",
+        "formula_complexity": 28.7,
+        "unit_rank": 30.6,
+        "dependency_count": 0.25,
+        "coverage_share": 0.36,
+        "effective_days": 36.3,
+        "source_age_days": 38.2,
+        "missing_policy": 0.69,
+        "recalculation_delay": 42.0,
+        "affected_members": 43.9,
+        "dimensions": 45.8,
+        "validation_rate": 0.36
+      },
+      "state": "drafted",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "indicator_definition-006",
+      "payload": {
+        "indicator_id": "indicator_id-0",
+        "formula_complexity": 32.4,
+        "unit_rank": 34.3,
+        "dependency_count": 0.36,
+        "coverage_share": 0.47,
+        "effective_days": 40.0,
+        "source_age_days": 41.9,
+        "missing_policy": 0.8,
+        "recalculation_delay": 45.7,
+        "affected_members": 47.6,
+        "dimensions": 49.5,
+        "validation_rate": 0.47
+      },
+      "state": "drafted",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "indicator_definition-007",
+      "payload": {
+        "indicator_id": "indicator_id-1",
+        "formula_complexity": 36.1,
+        "unit_rank": 38.0,
+        "dependency_count": 0.47,
+        "coverage_share": 0.58,
+        "effective_days": 43.7,
+        "source_age_days": 45.6,
+        "missing_policy": 0.91,
+        "recalculation_delay": 49.4,
+        "affected_members": 51.3,
+        "dimensions": 53.2,
+        "validation_rate": 0.58
+      },
+      "state": "drafted",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "indicator_definition-008",
+      "payload": {
+        "indicator_id": "indicator_id-2",
+        "formula_complexity": 39.8,
+        "unit_rank": 41.7,
+        "dependency_count": 0.58,
+        "coverage_share": 0.69,
+        "effective_days": 47.4,
+        "source_age_days": 49.3,
+        "missing_policy": 0.25,
+        "recalculation_delay": 53.1,
+        "affected_members": 55.0,
+        "dimensions": 56.9,
+        "validation_rate": 0.69
+      },
+      "state": "drafted",
+      "source": "synthetic-local-acceptance"
+    }
+  ]
+}
