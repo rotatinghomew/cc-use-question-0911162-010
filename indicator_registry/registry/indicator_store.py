@@ -60,9 +60,38 @@ CREATE TABLE IF NOT EXISTS runs(
     started_at TEXT NOT NULL,
     finished_at TEXT
 );
+CREATE TABLE IF NOT EXISTS definition_snapshots(
+    snapshot_hash TEXT PRIMARY KEY,
+    version_map_json TEXT NOT NULL,
+    snapshot_json TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS computations(
+    definition_id TEXT NOT NULL,
+    version TEXT NOT NULL,
+    content_hash TEXT NOT NULL,
+    snapshot_hash TEXT NOT NULL,
+    status TEXT NOT NULL,
+    value REAL,
+    entry_json TEXT NOT NULL,
+    computed_at TEXT NOT NULL,
+    PRIMARY KEY(definition_id, version, content_hash, snapshot_hash)
+);
+CREATE TABLE IF NOT EXISTS reports(
+    report_id TEXT PRIMARY KEY,
+    definition_snapshot_hash TEXT NOT NULL,
+    version_map_json TEXT NOT NULL,
+    status TEXT NOT NULL,
+    publishable INTEGER NOT NULL,
+    output_path TEXT,
+    report_json TEXT NOT NULL,
+    issued_at TEXT NOT NULL
+);
 CREATE INDEX IF NOT EXISTS idx_records_state ON records(state, updated_at);
 CREATE INDEX IF NOT EXISTS idx_events_aggregate ON events(aggregate_id, event_id);
 CREATE INDEX IF NOT EXISTS idx_decisions_record ON decisions(record_id, decided_at);
+CREATE INDEX IF NOT EXISTS idx_computations_identity ON computations(definition_id, version, computed_at);
+CREATE INDEX IF NOT EXISTS idx_reports_snapshot ON reports(definition_snapshot_hash, issued_at);
 """
 
 
@@ -233,9 +262,114 @@ class Repository:
     def snapshot(self) -> dict[str, Any]:
         with self.connect() as connection:
             counts = {table: connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
-                      for table in ("records", "record_versions", "decisions", "events", "runs")}
+                      for table in ("records", "record_versions", "decisions", "events", "runs",
+                                    "definition_snapshots", "computations", "reports")}
             states = {row[0]: row[1] for row in connection.execute("SELECT state,COUNT(*) FROM records GROUP BY state")}
         return {"counts": counts, "states": states, "chain_errors": self.verify_chain()}
+
+    # ------------------------------------------------------------------
+    # Definition versions, computations and issued reports
+    # ------------------------------------------------------------------
+    def save_definition_snapshot(self, snapshot: Mapping[str, Any]) -> str:
+        snapshot_hash = str(snapshot["snapshot_hash"])
+        body = canonical_json(snapshot)
+        with self.transaction() as connection:
+            row = connection.execute("SELECT snapshot_json FROM definition_snapshots WHERE snapshot_hash=?",
+                                     (snapshot_hash,)).fetchone()
+            if row and row[0] != body:
+                raise ContractError("conflicting definition snapshot")
+            connection.execute("INSERT OR IGNORE INTO definition_snapshots(snapshot_hash,version_map_json,snapshot_json,created_at) VALUES(?,?,?,?)",
+                               (snapshot_hash, canonical_json(snapshot.get("version_map") or {}), body, utc_now()))
+            self.append_event(connection, "definitions.snapshot", snapshot_hash, 1,
+                              {"snapshot_hash": snapshot_hash, "version_map": snapshot.get("version_map") or {}})
+        return snapshot_hash
+
+    def definition_snapshot(self, snapshot_hash: str) -> dict[str, Any] | None:
+        with self.connect() as connection:
+            row = connection.execute("SELECT snapshot_json FROM definition_snapshots WHERE snapshot_hash=?",
+                                     (snapshot_hash,)).fetchone()
+        return json.loads(row[0]) if row else None
+
+    def save_computations(self, entries: Sequence[Mapping[str, Any]]) -> int:
+        saved = 0
+        with self.transaction() as connection:
+            for entry in entries:
+                connection.execute(
+                    "INSERT OR REPLACE INTO computations(definition_id,version,content_hash,snapshot_hash,status,value,entry_json,computed_at) VALUES(?,?,?,?,?,?,?,?)",
+                    (entry["definition_id"], entry["version"], entry["content_hash"], entry["snapshot_hash"],
+                     entry["status"], entry.get("value"), canonical_json(entry), utc_now()))
+                saved += 1
+            self.append_event(connection, "computations.saved", "recalculation",
+                              self.event_count("recalculation", connection) + 1,
+                              {"count": saved, "snapshot_hash": entries[0]["snapshot_hash"] if entries else None})
+        return saved
+
+    def record_definition_changes(self, snapshot_hash: str, changed: Sequence[str],
+                                  details: Mapping[str, Mapping[str, str]] | None = None) -> None:
+        if not changed:
+            return
+        with self.transaction() as connection:
+            version = self.event_count("definitions", connection) + 1
+            self.append_event(connection, "definitions.changed", "definitions", version,
+                              {"snapshot_hash": snapshot_hash, "changed": list(changed),
+                               "details": dict(sorted((details or {}).items()))})
+
+    def computations_for(self, snapshot_hash: str) -> list[dict[str, Any]]:
+        with self.connect() as connection:
+            rows = connection.execute("SELECT entry_json FROM computations WHERE snapshot_hash=? ORDER BY definition_id",
+                                      (snapshot_hash,)).fetchall()
+        return [json.loads(row[0]) for row in rows]
+
+    def prior_computations(self) -> dict[str, dict[str, Any]]:
+        """Latest stored computation per definition id (used for reuse)."""
+
+        with self.connect() as connection:
+            rows = connection.execute(
+                "SELECT definition_id,entry_json FROM computations ORDER BY computed_at DESC, rowid DESC").fetchall()
+        result: dict[str, dict[str, Any]] = {}
+        for row in rows:
+            result.setdefault(row[0], json.loads(row[1]))
+        return result
+
+    def save_report(self, report: Mapping[str, Any]) -> str:
+        report_id = str(report["report_id"])
+        with self.transaction() as connection:
+            connection.execute(
+                "INSERT OR IGNORE INTO reports(report_id,definition_snapshot_hash,version_map_json,status,publishable,output_path,report_json,issued_at) VALUES(?,?,?,?,?,?,?,?)",
+                (report_id, report["definition_snapshot_hash"],
+                 canonical_json(report.get("version_map") or {}), report["status"],
+                 1 if report.get("publishable") else 0, report.get("output_path"),
+                 canonical_json(report), report["issued_at"]))
+            self.append_event(connection, "report.issued", report_id, 1,
+                              {"report_id": report_id, "status": report["status"],
+                               "definition_snapshot_hash": report["definition_snapshot_hash"],
+                               "publishable": bool(report.get("publishable"))})
+        return report_id
+
+    def report(self, report_id: str) -> dict[str, Any] | None:
+        with self.connect() as connection:
+            row = connection.execute("SELECT report_json FROM reports WHERE report_id=?", (report_id,)).fetchone()
+        return json.loads(row[0]) if row else None
+
+    def report_for_snapshot(self, snapshot_hash: str) -> dict[str, Any] | None:
+        with self.connect() as connection:
+            row = connection.execute(
+                "SELECT report_json FROM reports WHERE definition_snapshot_hash=? ORDER BY issued_at, report_id LIMIT 1",
+                (snapshot_hash,)).fetchone()
+        return json.loads(row[0]) if row else None
+
+    def reports(self) -> list[dict[str, Any]]:
+        with self.connect() as connection:
+            rows = connection.execute("SELECT report_json FROM reports ORDER BY issued_at, report_id").fetchall()
+        return [json.loads(row[0]) for row in rows]
+
+    def current_definition_snapshot(self) -> dict[str, Any] | None:
+        """Newest definition snapshot, used to flag an old report as historical."""
+
+        with self.connect() as connection:
+            row = connection.execute(
+                "SELECT snapshot_hash FROM definition_snapshots ORDER BY created_at DESC, rowid DESC LIMIT 1").fetchone()
+        return self.definition_snapshot(row[0]) if row else None
 
     def decision_rows(self) -> list[dict[str, Any]]:
         with self.connect() as connection:

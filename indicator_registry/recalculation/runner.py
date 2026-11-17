@@ -1152,6 +1152,10 @@ def decide(record: DomainRecord, context: Mapping[str, Any] | None = None) -> De
         outcome = 'reject'
     reasons = (f"score={effective_score:.6f}", f"superseded={superseded}",
                f"guards={guards['passed']}/{guards['passed'] + guards['failed']}")
+    decided_at = context.get("decided_at")
+    if decided_at:
+        return Decision(record.record_id, outcome, effective_score, reasons, rules,
+                        scorecard['metrics'], decided_at=str(decided_at))
     return Decision(record.record_id, outcome, effective_score, reasons, rules, scorecard['metrics'])
 
 def advance_for_outcome(record: DomainRecord, decision: Decision) -> DomainRecord:

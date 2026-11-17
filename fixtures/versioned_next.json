@@ -1,0 +1,249 @@
+{
+  "scenario": "人工智能治理指标口径版本与回算注册中心（版本化验收）",
+  "synthetic": true,
+  "as_of": "2025-06-30",
+  "changes": [
+    "gov-a@3"
+  ],
+  "records": [
+    {
+      "record_id": "def-a-1",
+      "state": "active",
+      "source": "test",
+      "payload": {
+        "definition_id": "gov-a",
+        "definition_version": "1",
+        "indicator_id": "ind-a",
+        "formula_complexity": 13.9,
+        "unit_rank": 15.8,
+        "dependency_count": 0.58,
+        "coverage_share": 0.69,
+        "effective_days": 21.5,
+        "source_age_days": 23.4,
+        "missing_policy": 0.25,
+        "recalculation_delay": 27.2,
+        "affected_members": 29.1,
+        "dimensions": 31.0,
+        "validation_rate": 0.69
+      }
+    },
+    {
+      "record_id": "def-a-2",
+      "state": "validated",
+      "source": "test",
+      "payload": {
+        "definition_id": "gov-a",
+        "definition_version": "2",
+        "indicator_id": "ind-a",
+        "formula_complexity": 31.9,
+        "unit_rank": 33.8,
+        "dependency_count": 0.58,
+        "coverage_share": 0.69,
+        "effective_days": 41.5,
+        "source_age_days": 23.4,
+        "missing_policy": 0.25,
+        "recalculation_delay": 27.2,
+        "affected_members": 59.1,
+        "dimensions": 61.0,
+        "validation_rate": 0.69
+      }
+    },
+    {
+      "record_id": "def-b-1",
+      "state": "active",
+      "source": "test",
+      "payload": {
+        "definition_id": "gov-b",
+        "definition_version": "1",
+        "indicator_id": "ind-b",
+        "depends_on": [
+          "gov-a@1"
+        ],
+        "dependency_versions": {
+          "gov-a": "1"
+        },
+        "observation_window_days": 365,
+        "min_observations": 1,
+        "formula_complexity": 18.1,
+        "unit_rank": 19.6,
+        "dependency_count": 0.7,
+        "coverage_share": 0.8,
+        "effective_days": 22.5,
+        "source_age_days": 120,
+        "missing_policy": 0.3,
+        "recalculation_delay": 20,
+        "affected_members": 33.0,
+        "dimensions": 35.0,
+        "validation_rate": 0.8
+      }
+    },
+    {
+      "record_id": "def-c-1",
+      "state": "active",
+      "source": "test",
+      "payload": {
+        "definition_id": "gov-c",
+        "definition_version": "1",
+        "indicator_id": "ind-c",
+        "depends_on": [
+          "gov-b@1"
+        ],
+        "formula_complexity": 20.1,
+        "unit_rank": 21.6,
+        "dependency_count": 0.3,
+        "coverage_share": 0.7,
+        "effective_days": 25.5,
+        "source_age_days": 30,
+        "missing_policy": 0.4,
+        "recalculation_delay": 22,
+        "affected_members": 43.0,
+        "dimensions": 45.0,
+        "validation_rate": 0.7
+      }
+    },
+    {
+      "record_id": "def-d-1",
+      "state": "active",
+      "source": "test",
+      "payload": {
+        "definition_id": "gov-d",
+        "definition_version": "1",
+        "indicator_id": "ind-d",
+        "depends_on": [
+          "gov-c@1",
+          "gov-b@1"
+        ],
+        "formula_complexity": 22.1,
+        "unit_rank": 23.6,
+        "dependency_count": 0.4,
+        "coverage_share": 0.6,
+        "effective_days": 26.5,
+        "source_age_days": 30,
+        "missing_policy": 0.4,
+        "recalculation_delay": 22,
+        "affected_members": 53.0,
+        "dimensions": 55.0,
+        "validation_rate": 0.6
+      }
+    },
+    {
+      "record_id": "def-e-1",
+      "state": "active",
+      "source": "test",
+      "payload": {
+        "definition_id": "gov-e",
+        "definition_version": "1",
+        "indicator_id": "ind-e",
+        "depends_on": [
+          "gov-e@1"
+        ],
+        "formula_complexity": 22.1,
+        "unit_rank": 23.6,
+        "dependency_count": 0.4,
+        "coverage_share": 0.6,
+        "effective_days": 26.5,
+        "source_age_days": 30,
+        "missing_policy": 0.4,
+        "recalculation_delay": 22,
+        "affected_members": 53.0,
+        "dimensions": 55.0,
+        "validation_rate": 0.6
+      }
+    },
+    {
+      "record_id": "def-f-1",
+      "state": "active",
+      "source": "test",
+      "payload": {
+        "definition_id": "gov-f",
+        "definition_version": "1",
+        "indicator_id": "ind-f",
+        "depends_on": [
+          "gov-e@1"
+        ],
+        "formula_complexity": 22.1,
+        "unit_rank": 23.6,
+        "dependency_count": 0.4,
+        "coverage_share": 0.6,
+        "effective_days": 26.5,
+        "source_age_days": 30,
+        "missing_policy": 0.4,
+        "recalculation_delay": 22,
+        "affected_members": 53.0,
+        "dimensions": 55.0,
+        "validation_rate": 0.6
+      }
+    },
+    {
+      "record_id": "def-g-1",
+      "state": "active",
+      "source": "test",
+      "payload": {
+        "definition_id": "gov-g",
+        "definition_version": "1",
+        "indicator_id": "ind-g",
+        "depends_on": [
+          "gov-missing@1"
+        ],
+        "formula_complexity": 22.1,
+        "unit_rank": 23.6,
+        "dependency_count": 0.4,
+        "coverage_share": 0.6,
+        "effective_days": 26.5,
+        "source_age_days": 30,
+        "missing_policy": 0.4,
+        "recalculation_delay": 22,
+        "affected_members": 53.0,
+        "dimensions": 55.0,
+        "validation_rate": 0.6
+      }
+    },
+    {
+      "record_id": "def-h-1",
+      "state": "active",
+      "source": "test",
+      "payload": {
+        "definition_id": "gov-h",
+        "definition_version": "1",
+        "indicator_id": "ind-h",
+        "observation_window_days": 90,
+        "min_observations": 3,
+        "source_observations": 1,
+        "formula_complexity": 22.1,
+        "unit_rank": 23.6,
+        "dependency_count": 0.4,
+        "coverage_share": 0.6,
+        "effective_days": 26.5,
+        "source_age_days": 10,
+        "missing_policy": 0.4,
+        "recalculation_delay": 22,
+        "affected_members": 53.0,
+        "dimensions": 55.0,
+        "validation_rate": 0.6
+      }
+    },
+    {
+      "record_id": "def-a-3",
+      "state": "validated",
+      "source": "test",
+      "payload": {
+        "definition_id": "gov-a",
+        "definition_version": "3",
+        "indicator_id": "ind-a",
+        "formula_complexity": 44.9,
+        "unit_rank": 45.8,
+        "dependency_count": 0.58,
+        "coverage_share": 0.69,
+        "effective_days": 51.5,
+        "source_age_days": 23.4,
+        "missing_policy": 0.25,
+        "recalculation_delay": 27.2,
+        "affected_members": 79.1,
+        "dimensions": 81.0,
+        "validation_rate": 0.69
+      }
+    }
+  ],
+  "issued_at": "2025-09-30T00:00:00+00:00",
+  "description": "Next release: gov-a moves to v3; only its dependency closure is recomputed."
+}

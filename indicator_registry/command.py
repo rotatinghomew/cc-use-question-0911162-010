@@ -18,8 +18,12 @@ def parser() -> argparse.ArgumentParser:
     check = commands.add_parser("verify")
     check.add_argument("--database", required=True)
     check.add_argument("--output", required=True)
+    check.add_argument("--report-id", default=None, help="verify a specific issued report")
     inspect = commands.add_parser("inspect")
     inspect.add_argument("--database", required=True)
+    versions = commands.add_parser("versions")
+    versions.add_argument("--database", required=True)
+    versions.add_argument("--definition-id", default=None)
     return root
 
 
@@ -28,7 +32,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.command == "run":
         result = run(args.fixture, args.database, args.output)
     elif args.command == "verify":
-        result = verify(args.database, args.output)
+        result = verify(args.database, args.output, report_id=args.report_id)
+    elif args.command == "versions":
+        result = Application(args.database).versions(args.definition_id)
     else:
         result = Application(args.database).inspect()
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))

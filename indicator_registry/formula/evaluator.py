@@ -16,6 +16,13 @@ class StationSignal:
     lead_time: float
 
 
+# Single source of truth for alert bands.  Publication, alerts.csv and the
+# report verifier all use these same thresholds so an alert can never
+# disagree with the number it was raised from.
+ALERT_THRESHOLDS = ((0.80, "superseded"), (0.60, "active"), (0.40, "validated"))
+ALERT_FLOOR = "drafted"
+
+
 def station_signal(record: DomainRecord) -> StationSignal:
     rainfall = bounded(finite_number(record.payload.get("formula_complexity", 0.0)) / 250.0)
     water = bounded(finite_number(record.payload.get("unit_rank", 0.0)) / 15.0)
@@ -44,8 +51,7 @@ def event_evaluator(records: Iterable[DomainRecord]) -> dict[str, float]:
 
 def alert_level(evaluator: dict[str, float], previous: str = "drafted") -> str:
     risk = evaluator["risk"] * (0.7 + evaluator["agreement"] * 0.3)
-    thresholds = [(0.80, "superseded"), (0.60, "active"), (0.40, "validated")]
-    target = next((name for threshold, name in thresholds if risk >= threshold), "drafted")
+    target = next((name for threshold, name in ALERT_THRESHOLDS if risk >= threshold), ALERT_FLOOR)
     order = ["drafted", "validated", "active", "superseded"]
     if previous in order and order.index(target) < order.index(previous) and evaluator["freshness"] < 0.75:
         return previous
